@@ -54,7 +54,8 @@ def earliest_ancestor(ancestors, starting_node):
     graph = Graph()
     for i in ancestors:
         graph.add_vertex(i)
-        graph.add_edge(graph.vertices[i][1], graph.vertices[i][0])
+        #connects the nodes backward from child to parent.
+        graph.add_edge(i[1], i[0])
 
     q = Queue()
     q.enqueue([starting_node])
@@ -64,7 +65,9 @@ def earliest_ancestor(ancestors, starting_node):
     while q:
         path = q.dequeue()
         last = path[-1]
-        print(path)
+        #use to track the longest path
+        longest_path = []
+
         if last not in visited:
             neighbors = graph.vertices[last]
             for neighbor in neighbors:
