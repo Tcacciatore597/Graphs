@@ -1,8 +1,24 @@
 
+import random
 
 class User:
     def __init__(self, name):
         self.name = name
+    def __repr__(self):
+        return self.name
+
+class Queue():
+    def __init__(self):
+        self.queue = []
+    def enqueue(self, value):
+        self.queue.append(value)
+    def dequeue(self):
+        if self.size() > 0:
+            return self.queue.pop(0)
+        else:
+            return None
+    def size(self):
+        return len(self.queue)
 
 class SocialGraph:
     def __init__(self):
@@ -47,9 +63,31 @@ class SocialGraph:
         # !!!! IMPLEMENT ME
 
         # Add users
+        # call addUser() until our number of users is numUsers
+        for i in range(numUsers):
+            self.addUser(f"User {i+1}")
 
-        # Create friendships
+        # Create random friendships
+        # totalFriendships = avgFriendships * numUsers
+        # Generate a list of all possible friendships
+        possibleFriendships = []
+        # Avoid dups by ensuring the first ID is smaller than the second
+        for userID in self.users:
+            for friendID in range(userID + 1, self.lastID + 1):
+                possibleFriendships.append( (userID, friendID) )
 
+        # Shuffle the list
+        random.shuffle(possibleFriendships)
+        print("random friendships:")
+        print(possibleFriendships)
+
+        # Slice off totalFriendships from the front, create friendships
+        totalFriendships = avgFriendships * numUsers // 2
+        print(f"Friendships to create: {totalFriendships}\n")
+        for i in range(totalFriendships):
+            friendship = possibleFriendships[i]
+            self.addFriendship( friendship[0], friendship[1] )
+            
     def getAllSocialPaths(self, userID):
         """
         Takes a user's userID as an argument
@@ -61,9 +99,20 @@ class SocialGraph:
         """
         visited = {}  # Note that this is a dictionary, not a set
         # !!!! IMPLEMENT ME
+        q = Queue()
+        q.enqueue([userID])
+        
+        while q.size() > 0:
+            path = q.dequeue()
+            last = path[-1]
+            if last not in visited:
+                for friend in self.friendships[last]:
+                    new_path = list(path)
+                    new_path.append(friend)
+                    q.enqueue(new_path)
+                visited.update( {last: path} )
         return visited
-
-
+        
 if __name__ == '__main__':
     sg = SocialGraph()
     sg.populateGraph(10, 2)
